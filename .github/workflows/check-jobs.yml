@@ -1,0 +1,67 @@
+name: Jobs with Ruff, Pytest and Coverage
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  get-changed-files:
+    runs-on: ubuntu-latest
+    outputs:
+      hw_01_changed: ${{ steps.get_changed_files.outputs.hw_01_changed }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Получаем полную историю для сравнения
+
+    - name: Get changed files
+      id: get_changed_files
+      uses: tj-actions/changed-files@v15
+      with:
+        files: |
+          HW_01/**
+
+    - name: Set output for hw_01
+      id: set_hw_01_output
+      run: |
+        if [ -n "${{ steps.get_changed_files.outputs.hw_01_changed }}" ]; then
+          run: echo "hw1_changed=true" >> $GITHUB_STATE
+        else
+          run: echo "hw1_changed=false" >> $GITHUB_STATE
+        fi
+        run: echo '${{ toJSON(needs.get-changed-files.outputs) }}'
+
+  job-for-hw-01:
+    runs-on: ubuntu-latest
+    needs: get-changed-files
+    if: ${{ needs.get-changed-files.outputs.hw_01_changed == 'true' }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install ruff pytest pytest-cov
+
+    - name: Run Ruff for hw_01
+      run: |
+        cd HW_01
+        ruff check .
+
+    - name: Run tests for hw_01
+      run: |
+        cd HW_01
+        pytest --vv --cov=. --cov-report=xml
+
+    - name: Upload coverage report for hw_01
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage-report-hw_01
+        path: HW_01/coverage.xml
