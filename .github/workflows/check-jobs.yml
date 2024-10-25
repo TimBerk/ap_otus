@@ -1,0 +1,60 @@
+name: Jobs with Ruff, Pytest and Coverage
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      first_homework: ${{ steps.filter.outputs.first_homework }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          first_homework:
+            - 'HW_01/**'
+
+    - name: first homework is changed
+      if: ${{ steps.filter.outputs.first_homework == 'true' }}
+      run: echo "HW_01 files changed"
+
+    - name: first homework not changed
+      if: ${{ steps.filter.outputs.first_homework != 'true' }}
+      run: echo "HW_01 files not changed"
+
+  first_homework:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.first_homework == 'true' }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install ruff pytest pytest-cov
+
+    - name: Lint with Ruff for hw_01
+      run: |
+        cd HW_01
+        ruff check .
+
+    - name: Test with pytest for hw_01
+      run: |
+        cd HW_01
+        coverage run -m pytest  -v -s
+
+    - name: Generate Coverage Report
+      run: |
+        cd HW_01
+        coverage report -m
