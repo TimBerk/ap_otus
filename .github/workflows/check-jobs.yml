@@ -124,33 +124,38 @@ jobs:
     if: ${{ needs.changes.outputs.go_homework == 'true' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.23.1'
 
-      - name: Install golangci-lint
-        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
-  
-      - name: Run golangci-lint
+      - name: Verify dependencies
         run: |
           cd additional
-          golangci-lint run ./...
+          go mod verify
+
+      - name: Run go vet
+        run: |
+          cd additional
+          go vet ./...
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Run staticcheck
+        run: |
+          cd additional
+          staticcheck ./...
+
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60
+          working-directory: additional
 
       - name: Run tests
         run:  |
           cd additional
-          go test -coverprofile=coverage.out ./...
-
-      - name: Generate coverage report
-        run:  |
-          cd additional
-          go tool cover -html=coverage.out -o coverage.html
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v3
-        with:
-          name: additional/coverage-report
-          path: additional/coverage.html
+          go test -vet=off ./...
