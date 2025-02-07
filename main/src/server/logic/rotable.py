@@ -1,11 +1,12 @@
 import zope
 
 from server.errors import RotateParamException
+from server.interfaces.cmd import ICommand
 from server.interfaces.rotable import IRotable
 from server.models import Angle
 
 
-@zope.interface.implementer(IRotable)
+@zope.interface.implementer(IRotable, ICommand)
 class Rotate:
     """Поворот объекта"""
 

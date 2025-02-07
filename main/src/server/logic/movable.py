@@ -1,11 +1,12 @@
 import zope
 
 from server.errors import MoveParamException
+from server.interfaces.cmd import ICommand
 from server.interfaces.movable import IMovable
 from server.models import Vector
 
 
-@zope.interface.implementer(IMovable)
+@zope.interface.implementer(IMovable, ICommand)
 class Move:
     """Движение объекта"""
 
