@@ -1,11 +1,11 @@
 from queue import Queue
 
-from server.cmd.log import CommandLog, handler_log
+from server.cmd.log import LogCommand, handler_log
 
 
 def test_success_log_command(exception, loguru_log):
     """Тестирование работы команды логирования"""
-    test_command = CommandLog(exception)
+    test_command = LogCommand(exception)
 
     test_command.execute()
 

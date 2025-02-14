@@ -2,13 +2,13 @@ from queue import Queue
 
 import pytest
 
-from server.cmd.repeat import CommandRepeat, handler_repeat
+from server.cmd.repeat import RepeatCommand, handler_repeat
 from server.errors import RepeatCommandException
 
 
 def test_success_repeat_command(success_command, capsys):
     """Тестирование успешной работы команды повтора"""
-    cmd_repeat = CommandRepeat(success_command, 1)
+    cmd_repeat = RepeatCommand(success_command, 1)
 
     cmd_repeat.execute()
 
@@ -19,7 +19,7 @@ def test_success_repeat_command(success_command, capsys):
 
 def test_error_repeat_command_without_retries(success_command, capsys):
     """Тестирование исключения при указании 0 количества повторов"""
-    cmd_repeat = CommandRepeat(success_command, 0)
+    cmd_repeat = RepeatCommand(success_command, 0)
 
     with pytest.raises(RepeatCommandException):
         cmd_repeat.execute()
