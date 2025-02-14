@@ -19,7 +19,7 @@ func TestCommandLog(t *testing.T) {
 	})
 	logrus.SetLevel(logrus.WarnLevel)
 	expectedLog := "level=warning msg=\"test error\" command=log\n"
-	command := NewCommandLog(errors.New("test error"))
+	command := NewLog(errors.New("test error"))
 
 	err := command.Execute()
 	logs := buf.String()

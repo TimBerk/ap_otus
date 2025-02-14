@@ -1,7 +1,8 @@
-package moving
+package move
 
 import (
 	"additional/internal/models/vector"
+	"additional/internal/services/moving"
 	"errors"
 	"testing"
 
@@ -13,14 +14,14 @@ type MockMovable struct {
 	mock.Mock
 }
 
-func (m *MockMovable) GetVelocity() vector.Vector {
+func (m *MockMovable) GetVelocity() (vector.Vector, error) {
 	args := m.Called()
-	return args.Get(0).(vector.Vector)
+	return args.Get(0).(vector.Vector), args.Error(1)
 }
 
-func (m *MockMovable) GetPosition() vector.Vector {
+func (m *MockMovable) GetPosition() (vector.Vector, error) {
 	args := m.Called()
-	return args.Get(0).(vector.Vector)
+	return args.Get(0).(vector.Vector), args.Error(1)
 }
 
 func (m *MockMovable) SetPosition(newPosition vector.Vector) error {
@@ -29,29 +30,24 @@ func (m *MockMovable) SetPosition(newPosition vector.Vector) error {
 }
 
 func TestMove(t *testing.T) {
-	movable := &Movable{
-		position: vector.Vector{X: 12, Y: 5},
-		velocity: vector.Vector{X: -7, Y: 3},
-	}
-	move := Move{movable: movable}
-	move.Execute()
+	movable := moving.NewMovable(vector.Vector{X: 12, Y: 5}, vector.Vector{X: -7, Y: 3})
+	move := NewMove(movable)
 
-	newPosition := movable.GetPosition()
+	err := move.Execute()
+
+	assert.Nil(t, err)
+	newPosition, _ := movable.GetPosition()
 	assert.Equal(t, vector.Vector{X: 5, Y: 8}, newPosition, "Ожидаемое положение после движения: (5, 8)")
-}
-
-func TestMoveNilMovable(t *testing.T) {
-	move := Move{movable: nil}
-	assert.Panics(t, func() { move.Execute() }, "Ожидалась паника при попытке сдвинуть nil объект")
 }
 
 func TestMoveInvalidPosition(t *testing.T) {
 	mockMovable := new(MockMovable)
 	mockMovable.On("GetPosition").Return(vector.Vector{}, errors.New("ошибка чтения положения"))
+	move := NewMove(mockMovable)
 
-	move := Move{movable: mockMovable}
-	assert.Panics(t, func() { move.Execute() }, "Ожидалась паника при невозможности прочитать положение")
+	err := move.Execute()
 
+	assert.Error(t, err)
 	mockMovable.AssertExpectations(t)
 }
 
@@ -59,10 +55,11 @@ func TestMoveInvalidVelocity(t *testing.T) {
 	mockMovable := new(MockMovable)
 	mockMovable.On("GetPosition").Return(vector.Vector{X: 12, Y: 5}, nil)
 	mockMovable.On("GetVelocity").Return(vector.Vector{}, errors.New("ошибка чтения скорости"))
+	move := NewMove(mockMovable)
 
-	move := Move{movable: mockMovable}
-	assert.Panics(t, func() { move.Execute() }, "Ожидалась паника при невозможности прочитать скорость")
+	err := move.Execute()
 
+	assert.Error(t, err)
 	mockMovable.AssertExpectations(t)
 }
 
@@ -71,9 +68,10 @@ func TestMoveInvalidPositionChange(t *testing.T) {
 	mockMovable.On("GetPosition").Return(vector.Vector{X: 12, Y: 5}, nil)
 	mockMovable.On("GetVelocity").Return(vector.Vector{X: -7, Y: 3}, nil)
 	mockMovable.On("SetPosition", mock.Anything).Return(errors.New("ошибка изменения положения"))
+	move := NewMove(mockMovable)
 
-	move := Move{movable: mockMovable}
-	assert.Panics(t, func() { move.Execute() }, "Ожидалась паника при невозможности изменить положение")
+	err := move.Execute()
 
+	assert.Error(t, err, "Ожидалась паника при невозможности изменить положение")
 	mockMovable.AssertExpectations(t)
 }
