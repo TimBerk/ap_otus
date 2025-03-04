@@ -2,7 +2,7 @@ package spaceship
 
 import (
 	"additional/internal/models/angle"
-	"additional/internal/services/rotating"
+	"additional/internal/services/cmd/rotate"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,9 +14,11 @@ func TestRotate(t *testing.T) {
 		angularVelocity: 10,
 	}
 
-	rotate := rotating.Rotate{Rotable: spaceship}
-	rotate.Execute()
+	rotateCmd := rotate.NewRotate(spaceship)
+	err := rotateCmd.Execute()
 
-	newAngle := spaceship.GetAngle()
+	assert.Nil(t, err)
+	newAngle, err := spaceship.GetAngle()
+	assert.Nil(t, err)
 	assert.Equal(t, 0, newAngle, "Ожидаемый угол: (0, 10)")
 }

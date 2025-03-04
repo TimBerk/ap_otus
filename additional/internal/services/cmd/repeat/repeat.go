@@ -7,20 +7,20 @@ import (
 	"reflect"
 )
 
-type CommandRepeat struct {
+type Repeat struct {
 	command    cmd.ICommand
 	retries    int
 	maxRetries int
 }
 
-func NewCommandRepeat(command cmd.ICommand, maxRetries int) *CommandRepeat {
-	return &CommandRepeat{
+func NewRepeat(command cmd.ICommand, maxRetries int) *Repeat {
+	return &Repeat{
 		command:    command,
 		maxRetries: maxRetries,
 	}
 }
 
-func (cr *CommandRepeat) Execute() error {
+func (cr *Repeat) Execute() error {
 	err := cr.command.Execute()
 	if cr.retries < cr.maxRetries {
 		cr.retries++
@@ -31,8 +31,8 @@ func (cr *CommandRepeat) Execute() error {
 
 func HandlerRepeat(command cmd.ICommand, maxRetries int, queue *cmd.CommandQueue[cmd.ICommand]) {
 	commandType := reflect.TypeOf(command)
-	if commandType != reflect.TypeOf((*CommandRepeat)(nil)).Elem() {
-		command = NewCommandRepeat(command, maxRetries)
+	if commandType != reflect.TypeOf((*Repeat)(nil)).Elem() {
+		command = NewRepeat(command, maxRetries)
 	}
 	queue.Add(command)
 }
