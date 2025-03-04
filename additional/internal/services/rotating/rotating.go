@@ -5,10 +5,10 @@ import (
 )
 
 type IRotable interface {
-	GetAngle() (int, error)
+	GetAngle() int
 	SetAngle(value int) error
-	GetDivision() (int, error)
-	GetAngularVelocity() (int, error)
+	GetDivision() int
+	GetAngularVelocity() int
 }
 
 type Rotable struct {
@@ -16,12 +16,8 @@ type Rotable struct {
 	angularVelocity int
 }
 
-func NewRotatable(alpha angle.Angle, angularVelocity int) *Rotable {
-	return &Rotable{alpha: alpha, angularVelocity: angularVelocity}
-}
-
-func (r *Rotable) GetAngle() (int, error) {
-	return r.alpha.Value, nil
+func (r *Rotable) GetAngle() int {
+	return r.alpha.Value
 }
 
 func (r *Rotable) SetAngle(newValue int) error {
@@ -29,10 +25,21 @@ func (r *Rotable) SetAngle(newValue int) error {
 	return nil
 }
 
-func (r *Rotable) GetDivision() (int, error) {
-	return r.alpha.Division, nil
+func (r *Rotable) GetDivision() int {
+	return r.alpha.Division
 }
 
-func (r *Rotable) GetAngularVelocity() (int, error) {
-	return r.angularVelocity, nil
+func (r *Rotable) GetAngularVelocity() int {
+	return r.angularVelocity
+}
+
+type Rotate struct {
+	Rotable IRotable
+}
+
+func (r *Rotate) Execute() {
+	newValue := (r.Rotable.GetAngle() + r.Rotable.GetAngularVelocity()) % r.Rotable.GetDivision()
+	if err := r.Rotable.SetAngle(newValue); err != nil {
+		panic(err)
+	}
 }
