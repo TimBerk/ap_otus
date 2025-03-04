@@ -7,7 +7,7 @@ from server.interfaces.cmd import ICommand
 
 
 @zope.interface.implementer(ICommand)
-class CommandLog:
+class LogCommand:
     """
     Реализация команды логирования посредствам решения loguru.
     """
@@ -22,5 +22,5 @@ class CommandLog:
 def handler_log(exception: Exception, cmd_q: Queue):
     """Обработчик для добавления исключения в виде команды в очередь"""
 
-    new_command = CommandLog(exception)
+    new_command = LogCommand(exception)
     cmd_q.put(new_command)

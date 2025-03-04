@@ -3,9 +3,9 @@ import zope.interface
 from server.models import Angle
 
 
-class IRotable(zope.interface.Interface):
+class IRotatable(zope.interface.Interface):
 
-    def get_angle(self) -> int:
+    def get_angle(self) -> Angle:
         """Получение угла"""
         ...
 

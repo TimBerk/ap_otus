@@ -7,7 +7,7 @@ from server.interfaces.cmd import ICommand
 
 
 @zope.interface.implementer(ICommand)
-class CommandRepeat:
+class RepeatCommand:
     """
     Реализация команды повтор.
     При достижении максимального количества повторов выбрасывается исключение  RepeatCommandException
@@ -29,6 +29,6 @@ class CommandRepeat:
 def handler_repeat(cmd: ICommand, max_retries, cmd_q: Queue):
     """Обработчик для повторного добавления команды в очередь"""
 
-    if not isinstance(cmd, CommandRepeat):
-        cmd = CommandRepeat(cmd, max_retries)
+    if not isinstance(cmd, RepeatCommand):
+        cmd = RepeatCommand(cmd, max_retries)
     cmd_q.put(cmd)
