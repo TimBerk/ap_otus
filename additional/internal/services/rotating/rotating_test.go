@@ -1,8 +1,7 @@
-package rotate
+package rotating
 
 import (
 	"additional/internal/models/angle"
-	"additional/internal/services/rotating"
 	"errors"
 	"testing"
 
@@ -14,9 +13,9 @@ type MockRotable struct {
 	mock.Mock
 }
 
-func (m *MockRotable) GetAngle() (int, error) {
+func (m *MockRotable) GetAngle() int {
 	args := m.Called()
-	return args.Get(0).(int), nil
+	return args.Get(0).(int)
 }
 
 func (m *MockRotable) SetAngle(newAngle int) error {
@@ -24,25 +23,25 @@ func (m *MockRotable) SetAngle(newAngle int) error {
 	return args.Error(0)
 }
 
-func (m *MockRotable) GetDivision() (int, error) {
+func (m *MockRotable) GetDivision() int {
 	args := m.Called()
-	return args.Get(0).(int), nil
+	return args.Get(0).(int)
 }
 
-func (m *MockRotable) GetAngularVelocity() (int, error) {
+func (m *MockRotable) GetAngularVelocity() int {
 	args := m.Called()
-	return args.Get(0).(int), nil
+	return args.Get(0).(int)
 }
 
 func TestRotate(t *testing.T) {
-	rotable := rotating.NewRotatable(angle.Angle{Value: 0, Division: 10}, 10)
-	rotate := NewRotate(rotable)
+	rotable := &Rotable{
+		alpha:           angle.Angle{Value: 0, Division: 10},
+		angularVelocity: 10,
+	}
+	rotate := Rotate{Rotable: rotable}
+	rotate.Execute()
 
-	err := rotate.Execute()
-
-	assert.Nil(t, err)
-	newAngle, err := rotable.GetAngle()
-	assert.Nil(t, err)
+	newAngle := rotable.GetAngle()
 	assert.Equal(t, 0, newAngle, "Ожидаемый угол: (0, 10)")
 }
 
@@ -52,10 +51,9 @@ func TestRotateInvalidAngleChange(t *testing.T) {
 	mockRotable.On("GetAngularVelocity").Return(10, nil)
 	mockRotable.On("GetDivision").Return(20, nil)
 	mockRotable.On("SetAngle", mock.Anything).Return(errors.New("Ошибка изменения положения"))
-	rotate := NewRotate(mockRotable)
 
-	err := rotate.Execute()
+	rotate := Rotate{Rotable: mockRotable}
+	assert.Panics(t, func() { rotate.Execute() }, "Ожидалась паника при невозможности изменить угол")
 
-	assert.Error(t, err, "Ожидалась паника при невозможности изменить угол")
 	mockRotable.AssertExpectations(t)
 }

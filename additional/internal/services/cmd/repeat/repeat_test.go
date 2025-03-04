@@ -16,11 +16,11 @@ func (sc SimpleCommand) Execute() error {
 	return nil
 }
 
-func TestRepeat(t *testing.T) {
+func TestCommandRepeat(t *testing.T) {
 	var buf bytes.Buffer
 	expectedOutput := "Test execute command"
 	baseCommand := &SimpleCommand{}
-	repeatCommand := NewRepeat(baseCommand, 1)
+	repeatCommand := NewCommandRepeat(baseCommand, 1)
 
 	err := repeatCommand.Execute()
 

@@ -7,22 +7,22 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Log struct {
+type CommandLog struct {
 	Exception error
 }
 
-func NewLog(exception error) *Log {
-	return &Log{
+func NewCommandLog(exception error) *CommandLog {
+	return &CommandLog{
 		Exception: exception,
 	}
 }
 
-func (cl Log) Execute() error {
+func (cl CommandLog) Execute() error {
 	logrus.WithFields(logrus.Fields{"command": "log"}).Warn(cl.Exception)
 	return nil
 }
 
 func HandlerLog(exception error, queue *cmd.CommandQueue[cmd.ICommand]) {
-	newCommand := NewLog(exception)
+	newCommand := NewCommandLog(exception)
 	queue.Add(newCommand)
 }
