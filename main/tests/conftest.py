@@ -3,6 +3,7 @@ import zope
 from loguru import logger
 
 from server.interfaces.cmd import ICommand
+from server.logic.ioc import IoCContainer
 from server.logic.ships import SpaceShip
 from server.models import Angle, Vector
 
@@ -57,3 +58,8 @@ def space_ship():
         fuel=10,
         rate_of_fuel=1,
     )
+
+
+@pytest.fixture
+def ioc():
+    return IoCContainer()
