@@ -3,7 +3,8 @@ import zope
 from loguru import logger
 
 from server.interfaces.cmd import ICommand
-from server.logic.ioc import IoCContainer
+from server.ioc.base import IoCContainer
+from server.ioc.movable import IoCMovable
 from server.logic.ships import SpaceShip
 from server.models import Angle, Vector
 
@@ -63,3 +64,8 @@ def space_ship():
 @pytest.fixture
 def ioc():
     return IoCContainer()
+
+
+@pytest.fixture
+def ioc_movable():
+    return IoCMovable()

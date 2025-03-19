@@ -2,7 +2,7 @@ import threading
 
 from server.cmd.move import MoveCommand
 from server.cmd.refuel import BurnFuelCommand
-from server.logic.ioc import IoCContainer
+from server.ioc.base import IoCContainer
 from server.logic.movable import Move
 from server.logic.refuelinge import Refueling
 from server.logic.ships import SpaceShip
