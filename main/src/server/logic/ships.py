@@ -10,7 +10,8 @@ class SpaceShip:
                  alpha: Angle | None = None,
                  angular_velocity: int | None = None,
                  fuel: int | None = None,
-                 rate_of_fuel: int | None = None):
+                 rate_of_fuel: int | None = None,
+                 is_active: bool = True):
         """
 
         :param id: идентификатор
@@ -28,3 +29,4 @@ class SpaceShip:
         self.angular_velocity = angular_velocity
         self.fuel = fuel
         self.rate_of_fuel = rate_of_fuel
+        self.is_active = is_active
